@@ -34,6 +34,9 @@ struct ContentView: View {
                     DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
                         .labelsHidden()
                 }
+                .onChange(of: wakeUp) { newValue in
+                    calculateBedtime()
+                }
                 
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Desired amount of sleep")
@@ -41,25 +44,32 @@ struct ContentView: View {
                     
                     Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
                 }
+                .onChange(of: sleepAmount) { newValue in
+                    calculateBedtime()
+                }
                     
                 VStack(alignment: .leading, spacing: 0) {
                     Text(" Daily coffee intake")
                         .font(.headline)
            
                   // Ways to change the word to plural
-                    Stepper("^[\(coffeeAmount) cup](inflect:true)", value: $coffeeAmount, in: 1...20)
+                    
+                    Picker("Amount of cups of coffee", selection: $coffeeAmount) {
+                        ForEach(1..<21) {
+                            Text("\($0)")
+                        }
+                    }
+                    .onChange(of: coffeeAmount) { newValue in
+                        calculateBedtime()
+                    }
+                  // Stepper("^[\(coffeeAmount) cup](inflect:true)", value: $coffeeAmount, in: 1...20)
                  // Stepper(coffeeAmount == 1 ? "1 cup" : "\(coffeeAmount) cups", value: $coffeeAmount, in: 1...20)
                 }
             }
             .navigationTitle("BetterRest")
-            .toolbar {
-                Button("Calculate", action: calculateBedtime)
-            }
-            .alert(alertTitle, isPresented: $showingAlert) {
-                Button("OK") {}
-            } message: {
-                Text(alertMessage)
-            }
+            Text("Your ideal bedtime is:")
+            Text(alertMessage)
+                .font(.title)
             
         }
     }
